@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+	<head>
+  		<meta charset="utf-8" />
+  		<title>My Fist Game</title>
+
+        <!--Scripts-->
+  		<script src="Sprite.js"  charset="utf-8" ></script>
+      <script src="Enemy.js"  charset="utf-8" ></script>
+  		<script src="Level.js"  charset="utf-8" ></script>
+  		<script src="ImageLoader.js"  charset="utf-8" ></script>
+  		<script src="AudioLoader.js"  charset="utf-8" ></script>
+
+	</head>
+	<body>
+  		<canvas width="900" height="720"></canvas>
+  		<script>
+
+        var tela = document.getElementsByTagName("canvas")[0];
+        var ctx = tela.getContext("2d");
+        
+        var imgLoad = new ImageLoader();
+        imgLoad.load("player","Assets/Naves/F5S4.png");
+        imgLoad.load("enemy","Assets/Naves/F5S2N.png");
+        imgLoad.load("shot","Assets/Efeitos/shot.png");
+
+        var fps = 120;
+        var atual = new Date();
+        var anterior = new Date();
+        var dt = 1/fps;
+
+        var player = new Sprite(450,680);
+        var life = 100;
+        var waves = 10;
+        var contwaves = 0;
+        var intervalInWaves = 200;
+
+        var level = new Level()
+        desenha();
+
+
+        function desenha(){
+        	requestAnimationFrame(desenha);
+        	atual = new Date();
+        	dt = (atual - anterior)/1000;
+        	ctx.clearRect(0,0,tela.width, tela.height)
+        	ctx.strokeRect(0,0,tela.width, tela.height)
+        	ctx.fillStyle = "darkgreen";
+        	ctx.fillText("dt: "+dt+" fps:"+Math.floor(1/dt), 10, 10);
+
+          player.mover(dt);
+          if(contwaves <= waves && intervalInWaves == 0){
+            level.spawn();
+            contwaves++;
+            intervalInWaves = 200;
+          }
+          level.mover(dt);
+
+
+       	  level.colidiuCom(player,function(inimigo, alvo){
+          		inimigo.color = "red";
+          });
+
+       		player.desenharImg(ctx, imgLoad.images["player"]);
+       	  level.desenharImg(ctx,imgLoad);
+       
+          anterior = atual;
+          intervalInWaves--;
+      }
+        
+        addEventListener("keydown", function(e){
+      
+        switch (e.keyCode) {
+          case 32:
+            level.fire(player, AudioLoader, "shot", 0.5);
+            break;
+          case 37:
+            player.vx = -400;
+            break;
+          case 39:
+            player.vx = +400;
+            break;
+          default:
+        }
+      });
+      addEventListener("keyup", function(e){
+        switch (e.keyCode) {
+          case 37:
+            player.vx = 0;
+            break;
+          case 39:
+            player.vx = 0;
+            break;
+          default:
+        }
+      });
+
+
+  		</script>
+	</body>
+</html>
