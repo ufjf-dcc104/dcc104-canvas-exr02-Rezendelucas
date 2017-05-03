@@ -51,10 +51,17 @@ Sprite.prototype.desenharImg = function (ctx, img) {
 
 
 Sprite.prototype.mover = function (dt) {
+  if(this.imgkey == "shot"){
+    this.vy = this.vy + this.ay*dt;
+    this.y = this.y + this.vy*dt;
+  }
   this.vx = this.vx + this.ax*dt;
-  this.vy = this.vy + (this.ay+this.g)*dt;
   this.x = this.x + this.vx*dt;
-  this.y = this.y + this.vy*dt;
+  if(this.cooldown>0) {
+    this.cooldown -= 0.08 + dt;
+  } else {
+    this.cooldown = 0;
+  }
 };
 
 Sprite.prototype.colidiuCom = function (alvo) {

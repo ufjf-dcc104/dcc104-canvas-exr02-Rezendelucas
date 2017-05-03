@@ -12,7 +12,7 @@ function Enemy(x,y){
   this.angle = 270;
   this.sentido;
 }
-
+ 
 Enemy.prototype.desenhar = function (ctx) {
   ctx.save();
   ctx.translate(this.x, this.y);
@@ -49,6 +49,19 @@ Enemy.prototype.mover = function (dt) {
   this.vx = this.vx + this.ax*dt;
   this.vy = this.vy + (this.ay+this.g)*dt;
   this.x = this.x + this.vx*dt;
+  this.y = this.y + this.vy*dt;
+};
+
+Enemy.prototype.moverZigZag = function (dt) {
+  this.vx = this.vx + this.ax*dt;
+  this.vy = this.vy + (this.ay+this.g)*dt;
+  if(this.sentido == 1){
+    this.x = this.x + 2 + (this.vx*dt);
+  }
+  else if(this.sentido == 2){
+    this.x = this.x + -2 + (this.vx*dt);
+  }else
+    this.x = this.x  + (this.vx*dt);
   this.y = this.y + this.vy*dt;
 };
 

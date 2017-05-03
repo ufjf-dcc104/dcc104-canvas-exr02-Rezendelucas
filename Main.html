@@ -13,7 +13,7 @@
 
 	</head>
 	<body>
-  		<canvas width="900" height="720"></canvas>
+  		<canvas width="500" height="720"></canvas>
   		<script>
 
         var tela = document.getElementsByTagName("canvas")[0];
@@ -24,19 +24,32 @@
         imgLoad.load("enemy","Assets/Naves/F5S2N.png");
         imgLoad.load("shot","Assets/Efeitos/shot.png");
 
+        var audLoad = new AudioLoader();
+        audLoad.load("shot","Audios/Missle_Launch.mp3")
+        audLoad.load("boom","Audios/Explosion.mp3")
+
         var fps = 120;
         var atual = new Date();
         var anterior = new Date();
         var dt = 1/fps;
 
-        var player = new Sprite(450,680);
-        var life = 100;
-        var waves = 10;
-        var contwaves = 0;
-        var intervalInWaves = 200;
-
+        var player = new Sprite(250,680);
         var level = new Level()
+        var energy = 100;
+        var score = 0;
+       	var gameOver = false;
+       	var intervalInWaves = 300;
+       	var vol = 0.05;
+
+        initGame();     
         desenha();
+
+        function initGame(){
+        	 energy = 100;
+        	 score = 0;
+        	 gameOver = false;
+        	 intervalInWaves = 300;
+        }
 
 
         function desenha(){
@@ -45,34 +58,78 @@
         	dt = (atual - anterior)/1000;
         	ctx.clearRect(0,0,tela.width, tela.height)
         	ctx.strokeRect(0,0,tela.width, tela.height)
+
+        //HUD	
         	ctx.fillStyle = "darkgreen";
+        	ctx.font="10px";
         	ctx.fillText("dt: "+dt+" fps:"+Math.floor(1/dt), 10, 10);
+        	ctx.fillText("Score : " + score, 400, 10);
+            lifeBar(); 
+           
 
-          player.mover(dt);
-          if(contwaves <= waves && intervalInWaves == 0){
-            level.spawn();
-            contwaves++;
-            intervalInWaves = 200;
-          }
-          level.mover(dt);
+          if(!gameOver){
+
+          	//checar colisoes
+          	player.colisaoCanto(dt); 
+            level.colisoesPlayer(player,audLoad,"boom", vol,function(inimigo, alvo){
+          		energy = energy - 10;
+          	});
+          	level.acertoDisparo(audLoad,"boom", vol, function(inimigo, alvo){
+          		score = score + 10;
+          	});
 
 
-       	  level.colidiuCom(player,function(inimigo, alvo){
-          		inimigo.color = "red";
-          });
+          	// player movimentaçao
+          	player.mover(dt);
 
-       		player.desenharImg(ctx, imgLoad.images["player"]);
-       	  level.desenharImg(ctx,imgLoad);
+          	// respawn de nova wave de naves e movimentaçao das mesmas
+          	if(intervalInWaves == 0){
+            	level.spawn();
+            	intervalInWaves = 300;
+          	}
+          	level.mover(dt);
+
+          	// desenhar na tela player e recursos do cenario(inimigos, balas)
+       	  	player.desenharImg(ctx, imgLoad.images["player"]);
+       	  	level.desenharImg(ctx,imgLoad);
        
-          anterior = atual;
-          intervalInWaves--;
+            // atualiza DT e tempo da proxima wave        
+      	    anterior = atual;
+       	    intervalInWaves--;
+
+       	    //checagem de energia e vidas
+            checkEnergy();
+           
+
+       	}else{// game over
+       		ctx.font="30px Verdana";
+       		ctx.fillText("Game Over",160,450);
+       	}
+      }
+
+      function checkEnergy(){
+      	if(energy <= 0)
+       	    	gameOver = true;
+      }
+
+      function lifeBar(){
+      	if(energy < 50)
+          	  ctx.fillStyle = "yellow";
+  		if(energy < 30)
+   			  ctx.fillStyle = "red";
+  		ctx.fillRect(20,550,20,-energy*3);
+  		ctx.fillStyle = "black";
+  		ctx.strokeRect(20,550,20,-300);
       }
         
-        addEventListener("keydown", function(e){
-      
+      addEventListener("keydown", function(e){
+      	if(gameOver)
+         	return	
         switch (e.keyCode) {
+          case 13:
+            initGame();
           case 32:
-            level.fire(player, AudioLoader, "shot", 0.5);
+            level.fire(player, audLoad, "shot", vol);
             break;
           case 37:
             player.vx = -400;
@@ -94,8 +151,6 @@
           default:
         }
       });
-
-
   		</script>
 	</body>
 </html>
