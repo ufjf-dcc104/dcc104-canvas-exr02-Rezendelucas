@@ -3,7 +3,6 @@ function Level (){
   this.shots = [];
   this.numberEnemys = 5;
   this.linhaDeRespawn = 1;
-  this.sentido = 1;
   //this.music = true;
   //this.end = false;
 
@@ -18,17 +17,21 @@ Level.prototype.spawn = function(){
   for (var i = 0; i < this.numberEnemys; i++) {
           var inimigo = new Enemy();
           if(this.linhaDeRespawn == 1){
-             eixoX = 100;
-             eixoX = eixoX + (20*i);
-          }else if(this.linhaDeRespawn == 2){
              eixoX = 200;
-             eixoX = eixoX + (20*i);
+             inimigo.comportamento = 1;
+             inimigo.linhaDeRespawn = this.linhaDeRespawn;
+          }else if(this.linhaDeRespawn == 2){
+             eixoX = 400;
+             inimigo.comportamento = 0;
+             inimigo.linhaDeRespawn = this.linhaDeRespawn;
             }else if(this.linhaDeRespawn == 3){
-               eixoX = 300;
-               eixoX = eixoX + (-20*i);
-              }else{
-                eixoX = 400;
-                eixoX = eixoX + (-20*i);
+               eixoX = 600;
+               inimigo.comportamento = 0;
+               inimigo.linhaDeRespawn = this.linhaDeRespawn;
+              }else if(this.linhaDeRespawn == 4){
+                eixoX = 800;
+                inimigo.comportamento = 1;
+                inimigo.linhaDeRespawn = this.linhaDeRespawn;
               }
           eixoY = -64 * (i + 1);
           inimigo.x = eixoX;
@@ -41,25 +44,21 @@ Level.prototype.spawn = function(){
           inimigo.vy = 300;
           inimigo.imgkey = "enemy";
           this.enemys.push(inimigo);
-          if(this.linhaDeRespawn == 1 || this.linhaDeRespawn == 4)
-             inimigo.sentido = this.sentido;
-         
     }
     if(this.linhaDeRespawn < 4)
         this.linhaDeRespawn++;
       else
         this.linhaDeRespawn = 1;
-
-    if(this.sentido == 1)
-       this.sentido = 2;
-     else
-      this.sentido =1;
 };
 
 Level.prototype.mover = function (dt) {
     for (var i = 0; i < this.enemys.length; i++) {
-         this.enemys[i].moverZigZag(dt);
-       }
+          if(this.enemys[i].comportamento == 0){
+             this.enemys[i].mover(dt)
+          }else{
+             this.enemys[i].comportamentoA(dt)
+          }
+      }
     for (var i = this.shots.length-1;i>=0; i--) {
         this.shots[i].mover(dt);
         if(
@@ -203,8 +202,8 @@ Sprite.prototype.colisaoCanto = function(dt){
  if(this.x <= 32){
       this.x = 32;
     }           
- if(this.x >= 468){
-      this.x = 468;  
+ if(this.x >= 968){
+      this.x = 968;  
  }
 };
 //

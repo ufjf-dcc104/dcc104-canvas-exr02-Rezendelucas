@@ -10,7 +10,8 @@ function Enemy(x,y){
   this.width = 64;
   this.height = 64;
   this.angle = 270;
-  this.sentido;
+  this.comportamento;
+  this.linhaDeRespawn;
 }
  
 Enemy.prototype.desenhar = function (ctx) {
@@ -39,7 +40,7 @@ Enemy.prototype.desenharImg = function (ctx, img) {
   ctx.fillStyle = this.color;
   ctx.drawImage(img, -this.width/2, -this.height/2, this.width, this.height);
   if(this.debug){
-    ctx.strokeStyle = "grey";
+    ctx.strokeStyle = "black";
     ctx.strokeRect(-this.width/2, -this.height/2, this.width, this.height);
   }
   ctx.restore();
@@ -52,17 +53,22 @@ Enemy.prototype.mover = function (dt) {
   this.y = this.y + this.vy*dt;
 };
 
-Enemy.prototype.moverZigZag = function (dt) {
+Enemy.prototype.comportamentoA = function (dt) {
   this.vx = this.vx + this.ax*dt;
   this.vy = this.vy + (this.ay+this.g)*dt;
-  if(this.sentido == 1){
-    this.x = this.x + 2 + (this.vx*dt);
+
+  if(this.linhaDeRespawn == 1){
+    this.y = this.y + this.vy*dt;
+    this.x = this.x + this.vx*dt;
+    if(this.y > 500)
+       this.x = this.x + ((this.vx*dt) + 2);
   }
-  else if(this.sentido == 2){
-    this.x = this.x + -2 + (this.vx*dt);
-  }else
-    this.x = this.x  + (this.vx*dt);
-  this.y = this.y + this.vy*dt;
+  else if(this.linhaDeRespawn == 4){
+    this.y = this.y + this.vy*dt;
+    this.x = this.x + this.vx*dt;
+    if(this.y > 500)
+       this.x = this.x - ((this.vx*dt) + 2);
+  }
 };
 
 Enemy.prototype.colidiuCom = function (alvo) {

@@ -48,8 +48,6 @@ Sprite.prototype.desenharImg = function (ctx, img) {
 };
 
 
-
-
 Sprite.prototype.mover = function (dt) {
   if(this.imgkey == "shot"){
     this.vy = this.vy + this.ay*dt;
