@@ -46,14 +46,32 @@ Enemy.prototype.desenharImg = function (ctx, img) {
   ctx.restore();
 };
 
-Enemy.prototype.mover = function (dt) {
+Enemy.prototype.comportamentoA = function (dt) {
   this.vx = this.vx + this.ax*dt;
   this.vy = this.vy + (this.ay+this.g)*dt;
   this.x = this.x + this.vx*dt;
   this.y = this.y + this.vy*dt;
 };
 
-Enemy.prototype.comportamentoA = function (dt) {
+Enemy.prototype.comportamentoB = function (dt) {
+  this.vx = this.vx + this.ax*dt;
+  this.vy = this.vy + (this.ay+this.g)*dt;
+
+  if(this.linhaDeRespawn == 1){
+    this.y = this.y + this.vy*dt;
+    this.x = this.x + this.vx*dt;
+    if(this.y > 500)
+       this.x = this.x + ((this.vx*dt) + 2);
+  }
+  else if(this.linhaDeRespawn == 4){
+    this.y = this.y + this.vy*dt;
+    this.x = this.x + this.vx*dt;
+    if(this.y > 500)
+       this.x = this.x - ((this.vx*dt) + 2);
+  }
+};
+
+Enemy.prototype.comportamentoC = function (dt) {
   this.vx = this.vx + this.ax*dt;
   this.vy = this.vy + (this.ay+this.g)*dt;
 

@@ -1,7 +1,7 @@
 function Level (){
   this.enemys = [];
   this.shots = [];
-  this.numberEnemys = 5;
+  this.numberEnemys = 3;
   this.linhaDeRespawn = 1;
   //this.music = true;
   //this.end = false;
@@ -33,11 +33,11 @@ Level.prototype.spawn = function(){
                 inimigo.comportamento = 1;
                 inimigo.linhaDeRespawn = this.linhaDeRespawn;
               }
-          eixoY = -64 * (i + 1);
+          eixoY = -80 * (i + 1);
           inimigo.x = eixoX;
           inimigo.y = eixoY;
-          inimigo.width = 64;
-          inimigo.height = 64;
+          inimigo.width = 80;
+          inimigo.height = 80;
           inimigo.angle = 90;
           inimigo.am = 00;
           inimigo.g = 0;
@@ -54,9 +54,9 @@ Level.prototype.spawn = function(){
 Level.prototype.mover = function (dt) {
     for (var i = 0; i < this.enemys.length; i++) {
           if(this.enemys[i].comportamento == 0){
-             this.enemys[i].mover(dt)
-          }else{
              this.enemys[i].comportamentoA(dt)
+          }else if(this.enemys[i].comportamento == 1){
+             this.enemys[i].comportamentoB(dt)
           }
       }
     for (var i = this.shots.length-1;i>=0; i--) {

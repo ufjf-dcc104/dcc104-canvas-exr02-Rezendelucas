@@ -23,10 +23,10 @@
         var ctx = tela.getContext("2d");
         
         var imgLoad = new ImageLoader();
-        imgLoad.load("player","Assets/Naves/F5S4.png");
-        imgLoad.load("enemy","Assets/Naves/F5S2N.png");
+        imgLoad.load("player","Assets/Naves/avião.png");
+        imgLoad.load("enemy","Assets/Naves/enemy.png");
         imgLoad.load("shot","Assets/Efeitos/shot.png");
-        imgLoad.load("background","Cenarios/fundo.jpg")
+        imgLoad.load("background","Cenarios/Ocean_island.jpg")
 
         var audLoad = new AudioLoader();
         audLoad.load("shot","Audios/Missle_Launch.mp3")
@@ -37,8 +37,13 @@
         var anterior = new Date();
         var dt = 1/fps;
 
-        var player = new Sprite(500,680);
-        var background = new Sprite(0,0);
+        var player = new Sprite(500,660);
+        var background_A = new Sprite(0,-720);
+        var background_B = new Sprite(0,-2140);
+        background_A.width = 1000;
+        background_A.height = 1440;
+        background_B.width = 1000;
+        background_B.height = 1440;
         var level = new Level()
         var energy = 100;
         var score = 0;
@@ -63,13 +68,7 @@
         	dt = (atual - anterior)/1000;
         	ctx.clearRect(0,0,tela.width, tela.height)
         	ctx.strokeRect(0,0,tela.width, tela.height)
-            ctx.drawImage(imgLoad.images["background"],0,0,tela.width,tela.height);
-        //HUD	
-            ctx.font = "40px Arial"      
-        	ctx.fillStyle = "white";
-        	ctx.fillText("dt: "+ dt +" fps:"+Math.floor(1/dt), 10, 30);
-        	ctx.fillText("Score : " + score, 800, 30);
-            lifeBar(); 
+        	//ctx.drawImage(imgLoad.images["background"],0,0,tela.width,1667);
            
 
           if(!gameOver){
@@ -92,11 +91,24 @@
             	level.spawn();
             	intervalInWaves = 300;
           	}
+          	if(background_A.y > 720 ){
+      			   background_A.y = -2130;
+          	}
+          	if(background_B.y > 720 ){
+        		   background_B.y = -2130;
+          	}
+          	background_A.moverFundo(dt);
+          	background_B.moverFundo(dt);
+
           	level.mover(dt);
 
           	// desenhar na tela player e recursos do cenario(inimigos, balas)
+       	  	background_A.desenharBackground(ctx, imgLoad.images["background"]);
+       	  	background_B.desenharBackground(ctx, imgLoad.images["background"]);
        	  	player.desenharImg(ctx, imgLoad.images["player"]);
        	  	level.desenharImg(ctx,imgLoad);
+       	  	lifeBar(); 
+       	  	HUD();
        
             // atualiza DT e tempo da proxima wave        
       	    anterior = atual;
@@ -116,6 +128,14 @@
       	if(energy <= 0)
        	    	gameOver = true;
       }
+
+      function HUD(){
+      	    ctx.font = "40px Arial"      
+        	ctx.fillStyle = "white";
+        	ctx.fillText("dt: "+ dt +" fps:"+Math.floor(1/dt), 10, 30);
+        	ctx.fillText("Score : " + score, 800, 30);
+            
+      };
 
       function lifeBar(){
       	ctx.fillStyle = "green"
