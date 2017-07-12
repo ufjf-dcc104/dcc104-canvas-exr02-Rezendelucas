@@ -10,6 +10,7 @@ function Enemy(x,y){
   this.width = 64;
   this.height = 64;
   this.angle = 270;
+  this.debug = true;
   this.comportamento;
   this.linhaDeRespawn;
 }
@@ -42,6 +43,7 @@ Enemy.prototype.desenharImg = function (ctx, img) {
   if(this.debug){
     ctx.strokeStyle = "black";
     ctx.strokeRect(-this.width/2, -this.height/2, this.width, this.height);
+    //ctx.fillRect(-this.width/2, -this.height/2, this.width, this.height);
   }
   ctx.restore();
 };
@@ -51,24 +53,6 @@ Enemy.prototype.comportamentoA = function (dt) {
   this.vy = this.vy + (this.ay+this.g)*dt;
   this.x = this.x + this.vx*dt;
   this.y = this.y + this.vy*dt;
-};
-
-Enemy.prototype.comportamentoB = function (dt) {
-  this.vx = this.vx + this.ax*dt;
-  this.vy = this.vy + (this.ay+this.g)*dt;
-
-  if(this.linhaDeRespawn == 1){
-    this.y = this.y + this.vy*dt;
-    this.x = this.x + this.vx*dt;
-    if(this.y > 500)
-       this.x = this.x + ((this.vx*dt) + 2);
-  }
-  else if(this.linhaDeRespawn == 4){
-    this.y = this.y + this.vy*dt;
-    this.x = this.x + this.vx*dt;
-    if(this.y > 500)
-       this.x = this.x - ((this.vx*dt) + 2);
-  }
 };
 
 Enemy.prototype.comportamentoC = function (dt) {
@@ -89,11 +73,35 @@ Enemy.prototype.comportamentoC = function (dt) {
   }
 };
 
+Enemy.prototype.comportamentoB = function (dt) {
+  if(this.linhaDeRespawn == 2){
+    this.y = this.y + this.vy*dt;
+    this.x = this.x + this.vx*dt;
+    if(this.y > 500){ 
+      this.angle = 75;
+      this.x = this.x + ((this.vx*dt) + 2);
+    } else{
+       this.vx = this.vx + this.ax*dt;
+       this.vy = this.vy + (this.ay+this.g)*dt;
+    } 
+  }
+  else if(this.linhaDeRespawn == 3){
+    this.y = this.y + this.vy*dt;
+    this.x = this.x + this.vx*dt;
+    if(this.y > 500)
+       this.angle = 125;
+       this.x = this.x - ((this.vx*dt) + 2);
+  }else{
+     this.vx = this.vx + this.ax*dt;
+     this.vy = this.vy + (this.ay+this.g)*dt;
+  }
+};
+
 Enemy.prototype.colidiuCom = function (alvo) {
-  if(this.x+this.width < alvo.x) return false;
-  if(this.x > alvo.x+this.width) return false;
-  if(this.y+this.height < alvo.y) return false;
-  if(this.y > alvo.y+this.height) return false;
+  if(this.x + this.width/2  < alvo.x - alvo.width/2 )  return false;  // colisão pela esquerda
+  if(this.x - this.width/2  > alvo.x + alvo.width/2 )  return false;  // colisão pela direita
+  if(this.y - this.height/2 > alvo.y + alvo.height/2)  return false;  // colisão por  cima
+  if(this.y + this.height/2 < alvo.y - alvo.height/2)  return false;  // colisão por  baixo
   return true;
 };
 

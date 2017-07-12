@@ -15,22 +15,25 @@ Level.prototype.spawn = function(){
   var eixoX = 0;
   var eixoY = 0;
   for (var i = 0; i < this.numberEnemys; i++) {
+          var ran = Math.random(0,2); 
+          ran = parseInt(ran);
           var inimigo = new Enemy();
           if(this.linhaDeRespawn == 1){
              eixoX = 200;
-             inimigo.comportamento = 1;
+             inimigo.comportamento = 2;
              inimigo.linhaDeRespawn = this.linhaDeRespawn;
           }else if(this.linhaDeRespawn == 2){
              eixoX = 400;
-             inimigo.comportamento = 0;
+             inimigo.comportamento = 1;
              inimigo.linhaDeRespawn = this.linhaDeRespawn;
             }else if(this.linhaDeRespawn == 3){
                eixoX = 600;
-               inimigo.comportamento = 0;
+               inimigo.comportamento = ran;
+               console.log(ran);
                inimigo.linhaDeRespawn = this.linhaDeRespawn;
               }else if(this.linhaDeRespawn == 4){
                 eixoX = 800;
-                inimigo.comportamento = 1;
+                inimigo.comportamento = 2;
                 inimigo.linhaDeRespawn = this.linhaDeRespawn;
               }
           eixoY = -80 * (i + 1);
@@ -57,6 +60,8 @@ Level.prototype.mover = function (dt) {
              this.enemys[i].comportamentoA(dt)
           }else if(this.enemys[i].comportamento == 1){
              this.enemys[i].comportamentoB(dt)
+          }else if(this.enemys[i].comportamento == 2){
+             this.enemys[i].comportamentoC(dt)
           }
       }
     for (var i = this.shots.length-1;i>=0; i--) {
@@ -142,12 +147,13 @@ Level.prototype.colisoesPlayer = function (alvo, audiolib, key, vol, resolveColi
 Level.prototype.acertoDisparo = function (audiolib, key, vol,resolveColisao) {
     for (var i = 0; i < this.enemys.length; i++) {
       for (var j = 0; j < this.shots.length; j++){
-          if(this.shots[j].colidiuCom(this.enemys[i])){
-            resolveColisao(this.enemys[i], this.shots[j]);
-            this.enemys.splice(i,1);
-            this.shots.splice(j,1);
-            if(audiolib && key)
-               audiolib.play(key,vol);
+          if(this.enemys[i].colidiuCom(this.shots[j])){
+              resolveColisao(this.enemys[i], this.shots[j]);
+              this.enemys.splice(i,1);
+              this.shots.splice(j,1);
+              if(audiolib && key)
+                 audiolib.play(key,vol);
+              break; 
            }
       }
     }
@@ -189,23 +195,25 @@ Level.prototype.colidiuComTiros = function(al, key){
     this.colidiuCom(this.shots[i],      
         function(inimigo){
             that.shots.splice(i,1);
-            x = that.inimigos.indexOf(inimigo);
-            that.inimigos.splice(x, 1);
-            that.score++;
+            x = that.enemys.indexOf(inimigo);
+            that.enemys.splice(x, 1);
             if(al&&key) al.play(key);
         }
       );
   }
 };
 
-Sprite.prototype.colisaoCanto = function(dt){ 
- if(this.x <= 32){
-      this.x = 32;
-    }           
- if(this.x >= 968){
-      this.x = 968;  
- }
+
+
+Level.prototype.colidiuCom = function (alvo, resolveColisao) {
+    for (var i = 0; i < this.enemys.length; i++) {
+      if(this.enemys[i].colidiuCom(alvo)){
+        resolveColisao(this.enemys[i], alvo);
+      }
+    }
 };
+
+
 //
 
 

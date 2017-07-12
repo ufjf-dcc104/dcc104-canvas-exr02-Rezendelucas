@@ -37,7 +37,7 @@
         var anterior = new Date();
         var dt = 1/fps;
 
-        var player = new Sprite(500,660);
+        var player = new Sprite(500,660);//(200,200);
         var background_A = new Sprite(0,-720);
         var background_B = new Sprite(0,-2140);
         background_A.width = 1000;
@@ -50,6 +50,7 @@
        	var gameOver = false;
        	var intervalInWaves = 300;
        	var vol = 0.05;
+       	var paused = false;
 
         initGame();     
         desenha();
@@ -72,11 +73,12 @@
            
 
           if(!gameOver){
-
+          	if(!paused){
           	//checar colisoes
           	player.colisaoCanto(dt); 
+            
             level.colisoesPlayer(player,audLoad,"boom", vol,function(inimigo, alvo){
-          		energy = energy - 10;
+          		 energy = energy - 10;
           	});
           	level.acertoDisparo(audLoad,"boom", vol, function(inimigo, alvo){
           		score = score + 10;
@@ -92,16 +94,16 @@
             	intervalInWaves = 300;
           	}
           	if(background_A.y > 720 ){
-      			   background_A.y = -2130;
+      			   background_A.y = background_B.y - background_A.height;
           	}
           	if(background_B.y > 720 ){
-        		   background_B.y = -2130;
+        		   background_B.y = background_A.y - background_B.height;
           	}
           	background_A.moverFundo(dt);
           	background_B.moverFundo(dt);
-
+             
           	level.mover(dt);
-
+            }
           	// desenhar na tela player e recursos do cenario(inimigos, balas)
        	  	background_A.desenharBackground(ctx, imgLoad.images["background"]);
        	  	background_B.desenharBackground(ctx, imgLoad.images["background"]);
@@ -109,7 +111,7 @@
        	  	level.desenharImg(ctx,imgLoad);
        	  	lifeBar(); 
        	  	HUD();
-       
+           
             // atualiza DT e tempo da proxima wave        
       	    anterior = atual;
        	    intervalInWaves--;
@@ -153,12 +155,20 @@
          	return	
         switch (e.keyCode) {
           case 13:
-           // initGame();
+            if(paused == true){paused = false;}
+            else {paused = true;}
+            break;
           case 32:
             level.fire(player, audLoad, "shot", vol);
             break;
+          case 40:
+            player.vy =  400;
+            break;  
           case 37:
             player.vx = -400;
+            break;
+          case 38:
+            player.vy = -400;
             break;
           case 39:
             player.vx = +400;
@@ -171,9 +181,15 @@
           case 37:
             player.vx = 0;
             break;
+          case 38:
+            player.vy = 0;
+            break;
           case 39:
             player.vx = 0;
             break;
+          case 40:
+            player.vy =  0;
+            break;  
           default:
         }
       });

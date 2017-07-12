@@ -13,6 +13,7 @@ function Sprite(x,y){
   this.vang = 0;
   this.color = "black";
   this.cooldown = 0;
+  this.debug = true;
 }
 
 Sprite.prototype.desenhar = function (ctx) {
@@ -41,8 +42,9 @@ Sprite.prototype.desenharImg = function (ctx, img) {
   ctx.fillStyle = this.color;
   ctx.drawImage(img, -this.width/2, -this.height/2, this.width, this.height);
   if(this.debug){
-    ctx.strokeStyle = "grey";
+    ctx.strokeStyle = "black";
     ctx.strokeRect(-this.width/2, -this.height/2, this.width, this.height);
+   //ctx.fillRect(-this.width/2, -this.height/2, this.width, this.height);
   }
   ctx.restore();
 };
@@ -63,6 +65,9 @@ Sprite.prototype.mover = function (dt) {
   }
   this.vx = this.vx + this.ax*dt;
   this.x = this.x + this.vx*dt;
+  this.vy = this.vy + this.ay*dt;
+  this.y = this.y + this.vy*dt;
+
   if(this.cooldown>0) {
     this.cooldown -= 0.08 + dt;
   } else {
@@ -78,14 +83,27 @@ Sprite.prototype.moverFundo = function (dt) {
 };
 
 Sprite.prototype.colidiuCom = function (alvo) {
-  if(this.x+this.width < alvo.x) return false;
-  if(this.x > alvo.x+this.width) return false;
-  if(this.y+this.height < alvo.y) return false;
-  if(this.y > alvo.y+this.height) return false;
+  if(this.x + this.width < alvo.x)   return false;  // colisão pela esquerda
+  if(this.x > alvo.x + alvo.width)   return false;  // colisão pela direita
+  if(this.y + this.height < alvo.y)  return false;  //  colisão por cima
+  if(this.y > alvo.y + alvo.height)  return false;  // colisão por baixo
   return true;
 };
 
-
+Sprite.prototype.colisaoCanto = function(dt){ 
+ if(this.x <= 40){
+      this.x = 40;
+    }           
+ if(this.x >= 960){
+      this.x = 960;  
+ }
+ if(this.y <= 40 ){
+     this.y = 40;
+ }
+ if(this.y >= 680){
+     this.y = 680;
+ }
+};
 
 
 
